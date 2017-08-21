@@ -1,3 +1,6 @@
+
+"use strict" ;
+
 /*
  * DOM Level 2
  * Object DOMException
@@ -6,9 +9,14 @@
  */
 
 function copy(src,dest){
+	/*
 	for(var p in src){
 		dest[p] = src[p];
 	}
+	*/
+	Object.getOwnPropertyNames( src ).forEach( key => {
+		Object.defineProperty( dest , key , Object.getOwnPropertyDescriptor( src , key ) ) ;
+	} ) ;
 }
 /**
 ^\w+\.prototype\.([_\w]+)\s*=\s*((?:.*\{\s*?[\r\n][\s\S]*?^})|\S.*?(?=[;\r\n]));?
@@ -436,6 +444,7 @@ function _visitNode(node,callback){
 
 function Document(){
 }
+
 function _onAddAttribute(doc,el,newAttr){
 	doc && doc._inc++;
 	var ns = newAttr.namespaceURI ;
@@ -702,8 +711,40 @@ Document.prototype = {
 			node.localName = qualifiedName;
 		}
 		return node;
-	}
+	},
+	
+	// Add querySelector and querySelectorAll
 };
+
+const nwmatcher = require( 'nwmatcher' ) ;
+
+Object.defineProperty( Document.prototype , 'nwmatcher' , {
+	//enumerable: true ,
+	configurable: true ,
+	get: function() {
+		// nwmatcher works in browser, this little hack make it work inside node.js
+		var matcher ;
+		var ctx = {} ;
+		ctx.document = this ;
+		ctx.document.addEventListener = function() {} ;
+		
+		//console.log( 'getter called' ) ;
+		
+		//console.log( this ) ;
+		try {
+			matcher = nwmatcher( ctx ) ;
+		}
+		catch ( error ) {
+			return null ;
+		}
+		
+		Object.defineProperty( this , 'nwmatcher' , {
+			value: matcher
+		} ) ;
+		
+		return matcher ;
+	}
+} ) ;
 _extends(Document,Node);
 
 
@@ -794,6 +835,9 @@ Element.prototype = {
 			return ls;
 			
 		});
+	},
+	querySelector: function( selectors ) {
+		return this.ownerDocument.nwmatcher.first( selectors , this ) ;
 	}
 };
 Document.prototype.getElementsByTagName = Element.prototype.getElementsByTagName;
