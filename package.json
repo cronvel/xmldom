@@ -1,7 +1,7 @@
 {
   "name": "@cronvel/xmldom",
-  "version": "0.1.28",
-  "description": "A W3C Standard XML DOM(Level2 CORE) implementation and parser(DOMParser/XMLSerializer).",
+  "version": "0.1.29",
+  "description": "A W3C Standard XML DOM(Level2 CORE + selectors) implementation and parser(DOMParser/XMLSerializer).",
   "keywords": [
     "w3c",
     "dom",
@@ -52,6 +52,10 @@
       "name": "Alan Gutierrez",
       "email": "alan@prettyrobots.com",
       "web": "http://www.prettyrobots.com/"
+    },
+    {
+      "name": "Cédric Ronvel",
+      "email": "cedric.ronvel@gmail.com"
     }
   ],
   "bugs": {
