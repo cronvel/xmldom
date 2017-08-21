@@ -714,6 +714,12 @@ Document.prototype = {
 	},
 	
 	// Add querySelector and querySelectorAll
+	querySelector: function( selectors ) {
+		return this.nwmatcher.first( selectors , this ) ;
+	},
+	querySelectorAll: function( selectors ) {
+		return this.nwmatcher.select( selectors , this ) ;
+	}
 };
 
 const nwmatcher = require( 'nwmatcher' ) ;
@@ -722,15 +728,14 @@ Object.defineProperty( Document.prototype , 'nwmatcher' , {
 	//enumerable: true ,
 	configurable: true ,
 	get: function() {
+		//console.log( 'getter called' ) ;
+		
 		// nwmatcher works in browser, this little hack make it work inside node.js
 		var matcher ;
 		var ctx = {} ;
 		ctx.document = this ;
 		ctx.document.addEventListener = function() {} ;
 		
-		//console.log( 'getter called' ) ;
-		
-		//console.log( this ) ;
 		try {
 			matcher = nwmatcher( ctx ) ;
 		}
@@ -836,8 +841,13 @@ Element.prototype = {
 			
 		});
 	},
+	
+	// Add querySelector and querySelectorAll
 	querySelector: function( selectors ) {
 		return this.ownerDocument.nwmatcher.first( selectors , this ) ;
+	},
+	querySelectorAll: function( selectors ) {
+		return this.ownerDocument.nwmatcher.select( selectors , this ) ;
 	}
 };
 Document.prototype.getElementsByTagName = Element.prototype.getElementsByTagName;
