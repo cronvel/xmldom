@@ -770,7 +770,7 @@ function Element() {
 	
 	// +++ cronvel
 	this.classList = new ClassList( this ) ;
-	this.style = new Style( this ) ;
+	this.style = new Proxy( this , StyleHandler ) ;
 	// --- cronvel
 };
 Element.prototype = {
@@ -921,13 +921,12 @@ ClassList.prototype = {
 
 // +++ cronvel
 // Rough hack to support .style access
-function Style( element ) {
-	this.__element = element ;
-};
-Style.prototype = {
-	__get: function( property ) {
-		var styles = this.__element.getAttribute( 'style' ).trim() ;
+const StyleHandler = {
+	get: function( target , property ) {
+		var styles = target.getAttribute( 'style' ).trim() ;
 		if ( ! styles ) { return ; }
+		
+		property = stringKit.camelCaseToDashed( property ) ;
 		
 		var match = styles.match( new RegExp( '(?:^|;) *' + property + ' *: *([^;]+?) *(?:;|$)' ) ) ;
 		
@@ -940,33 +939,39 @@ Style.prototype = {
 			return undefined ;
 		}
 	} ,
-	__set: function( property , value ) {
-		var styles = this.__element.getAttribute( 'style' ).trim() ;
+	set: function( target , property , value , receiver ) {
+		var styles = target.getAttribute( 'style' ).trim() ;
+		
+		property = stringKit.camelCaseToDashed( property ) ;
 		
 		if ( ! styles )
 		{
-			this.__element.setAttribute( 'style' , property + ':' + value ) ;
-			return ;
+			if ( value ) { target.setAttribute( 'style' , property + ':' + value ) ; }
+			return true ;
 		}
 		
-		var replaced = false ;
+		var found = false ;
 		
 		styles = styles.replace(
-			new RegExp( '((?:^|;) *' + property + ' *: *)([^;]+?)( *(?:;|$))' ) ,
+			//new RegExp( '(^|;) *' + string.escape.regExp( property ) + ' *: *([^;]+?) *(;|$)' ) ,
+			new RegExp( '(^|;) *' + property + ' *: *([^;]+?) *(;|$)' ) ,
 			( full , pre , val , post ) => {
-				replaced = true ;
-				return pre + value + post ;
+				found = true ;
+				if ( value ) { return pre + property + ':' + value + post ; }
+				else { return pre ; }
 			}
 		) ;
 		
-		if ( replaced )
+		if ( found )
 		{
-			this.__element.setAttribute( 'style' , styles ) ;
+			target.setAttribute( 'style' , styles.trim() ) ;
 		}
-		else
+		else if ( value )
 		{
-			this.__element.setAttribute( 'style' , styles + ';' + property + ':' + value ) ;
+			target.setAttribute( 'style' , styles + ';' + property + ':' + value ) ;
 		}
+		
+		return true ;
 	}
 } ;
 // --- cronvel
