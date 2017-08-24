@@ -25,7 +25,8 @@
     "node": ">=0.1"
   },
   "dependencies": {
-    "nwmatcher": "^1.4.1"
+    "nwmatcher": "^1.4.1",
+    "string-kit": "^0.6.1"
   },
   "devDependencies": {
     "proof": "0.0.28"
@@ -62,5 +63,5 @@
     "email": "jindw@xidea.org",
     "url": "http://github.com/jindw/xmldom/issues"
   },
-  "license": "(LGPL-2.0 or MIT)"
+  "license": "(LGPL-2.0 OR MIT)"
 }

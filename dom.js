@@ -1,6 +1,10 @@
 
 "use strict" ;
 
+// +++ cronvel
+const stringKit = require( 'string-kit' ) ;
+// --- cronvel
+
 /*
  * DOM Level 2
  * Object DOMException
@@ -9,14 +13,17 @@
  */
 
 function copy(src,dest){
+	// +++ cronvel
 	/*
 	for(var p in src){
 		dest[p] = src[p];
 	}
 	*/
+	
 	Object.getOwnPropertyNames( src ).forEach( key => {
 		Object.defineProperty( dest , key , Object.getOwnPropertyDescriptor( src , key ) ) ;
 	} ) ;
+	// --- cronvel
 }
 /**
 ^\w+\.prototype\.([_\w]+)\s*=\s*((?:.*\{\s*?[\r\n][\s\S]*?^})|\S.*?(?=[;\r\n]));?
@@ -713,6 +720,7 @@ Document.prototype = {
 		return node;
 	},
 	
+	// +++ cronvel
 	// Add querySelector and querySelectorAll
 	querySelector: function( selectors ) {
 		return this.nwmatcher.first( selectors , this ) ;
@@ -720,8 +728,10 @@ Document.prototype = {
 	querySelectorAll: function( selectors ) {
 		return this.nwmatcher.select( selectors , this ) ;
 	}
+	// --- cronvel
 };
 
+// +++ cronvel
 const nwmatcher = require( 'nwmatcher' ) ;
 
 Object.defineProperty( Document.prototype , 'nwmatcher' , {
@@ -750,11 +760,18 @@ Object.defineProperty( Document.prototype , 'nwmatcher' , {
 		return matcher ;
 	}
 } ) ;
+// --- cronvel
+
 _extends(Document,Node);
 
 
 function Element() {
 	this._nsMap = {};
+	
+	// +++ cronvel
+	this.classList = new ClassList( this ) ;
+	this.style = new Style( this ) ;
+	// --- cronvel
 };
 Element.prototype = {
 	nodeType : ELEMENT_NODE,
@@ -842,6 +859,7 @@ Element.prototype = {
 		});
 	},
 	
+	// +++ cronvel
 	// Add querySelector and querySelectorAll
 	querySelector: function( selectors ) {
 		return this.ownerDocument.nwmatcher.first( selectors , this ) ;
@@ -849,12 +867,111 @@ Element.prototype = {
 	querySelectorAll: function( selectors ) {
 		return this.ownerDocument.nwmatcher.select( selectors , this ) ;
 	}
+	// --- cronvel
 };
 Document.prototype.getElementsByTagName = Element.prototype.getElementsByTagName;
 Document.prototype.getElementsByTagNameNS = Element.prototype.getElementsByTagNameNS;
 
 
 _extends(Element,Node);
+
+
+// +++ cronvel
+// Rough hack to support .classList.add() and .classList.remove()
+function ClassList( element ) {
+	this.__element = element ;
+};
+ClassList.prototype = {
+	add: function( className ) {
+		var classes = this.__element.getAttribute( 'class' ).trim() ;
+		
+		if ( classes )
+		{
+			classes = classes.split( / +/ ) ;
+			if ( classes.indexOf( className ) === -1 )
+			{
+				classes.push( className ) ;
+				this.__element.setAttribute( 'class' , classes.join( ' ' ) ) ;
+			}
+		}
+		else
+		{
+			this.__element.setAttribute( 'class' , className ) ;
+		}
+	} ,
+	remove: function( className ) {
+		var indexOf ,
+			classes = this.__element.getAttribute( 'class' ).trim() ;
+		
+		if ( classes )
+		{
+			classes = classes.split( / +/ ) ;
+			indexOf = classes.indexOf( className ) ;
+			
+			if ( indexOf !== -1 )
+			{
+				classes.splice( indexOf , 1 ) ;
+				this.__element.setAttribute( 'class' , classes.join( ' ' ) ) ;
+			}
+		}
+	}
+} ;
+// --- cronvel
+
+
+// +++ cronvel
+// Rough hack to support .style access
+function Style( element ) {
+	this.__element = element ;
+};
+Style.prototype = {
+	__get: function( property ) {
+		var styles = this.__element.getAttribute( 'style' ).trim() ;
+		if ( ! styles ) { return ; }
+		
+		var match = styles.match( new RegExp( '(?:^|;) *' + property + ' *: *([^;]+?) *(?:;|$)' ) ) ;
+		
+		if ( match )
+		{
+			return match[ 1 ] ;
+		}
+		else
+		{
+			return undefined ;
+		}
+	} ,
+	__set: function( property , value ) {
+		var styles = this.__element.getAttribute( 'style' ).trim() ;
+		
+		if ( ! styles )
+		{
+			this.__element.setAttribute( 'style' , property + ':' + value ) ;
+			return ;
+		}
+		
+		var replaced = false ;
+		
+		styles = styles.replace(
+			new RegExp( '((?:^|;) *' + property + ' *: *)([^;]+?)( *(?:;|$))' ) ,
+			( full , pre , val , post ) => {
+				replaced = true ;
+				return pre + value + post ;
+			}
+		) ;
+		
+		if ( replaced )
+		{
+			this.__element.setAttribute( 'style' , styles ) ;
+		}
+		else
+		{
+			this.__element.setAttribute( 'style' , styles + ';' + property + ':' + value ) ;
+		}
+	}
+} ;
+// --- cronvel
+
+
 function Attr() {
 };
 Attr.prototype.nodeType = ATTRIBUTE_NODE;
