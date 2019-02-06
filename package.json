@@ -1,6 +1,6 @@
 {
   "name": "@cronvel/xmldom",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "description": "A W3C Standard XML DOM(Level2 CORE + selectors) implementation and parser(DOMParser/XMLSerializer).",
   "keywords": [
     "w3c",
@@ -18,19 +18,15 @@
     "url": "git://github.com/jindw/xmldom.git"
   },
   "main": "./dom-parser.js",
-  "scripts": {
-    "test": "proof platform win32 && proof test */*/*.t.js || t/test"
-  },
+  "scripts": {},
   "engines": {
     "node": ">=0.1"
   },
   "dependencies": {
-    "nwmatcher": "^1.4.1",
-    "string-kit": "^0.6.1"
+    "nwmatcher": "^1.4.4",
+    "string-kit": "^0.9.1"
   },
-  "devDependencies": {
-    "proof": "0.0.28"
-  },
+  "devDependencies": {},
   "maintainers": [
     {
       "name": "jindw",
