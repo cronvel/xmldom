@@ -885,17 +885,14 @@ ClassList.prototype = {
 	add: function( className ) {
 		var classes = this.__element.getAttribute( 'class' ).trim() ;
 		
-		if ( classes )
-		{
+		if ( classes ) {
 			classes = classes.split( / +/ ) ;
-			if ( classes.indexOf( className ) === -1 )
-			{
+			if ( classes.indexOf( className ) === -1 ) {
 				classes.push( className ) ;
 				this.__element.setAttribute( 'class' , classes.join( ' ' ) ) ;
 			}
 		}
-		else
-		{
+		else {
 			this.__element.setAttribute( 'class' , className ) ;
 		}
 	} ,
@@ -903,13 +900,11 @@ ClassList.prototype = {
 		var indexOf ,
 			classes = this.__element.getAttribute( 'class' ).trim() ;
 		
-		if ( classes )
-		{
+		if ( classes ) {
 			classes = classes.split( / +/ ) ;
 			indexOf = classes.indexOf( className ) ;
 			
-			if ( indexOf !== -1 )
-			{
+			if ( indexOf !== -1 ) {
 				classes.splice( indexOf , 1 ) ;
 				this.__element.setAttribute( 'class' , classes.join( ' ' ) ) ;
 			}
@@ -930,12 +925,10 @@ const StyleHandler = {
 		
 		var match = styles.match( new RegExp( '(?:^|;) *' + property + ' *: *([^;]+?) *(?:;|$)' ) ) ;
 		
-		if ( match )
-		{
+		if ( match ) {
 			return match[ 1 ] ;
 		}
-		else
-		{
+		else {
 			return undefined ;
 		}
 	} ,
@@ -944,8 +937,7 @@ const StyleHandler = {
 		
 		property = stringKit.camelCaseToDashed( property ) ;
 		
-		if ( ! styles )
-		{
+		if ( ! styles ) {
 			if ( value ) { target.setAttribute( 'style' , property + ':' + value ) ; }
 			return true ;
 		}
@@ -962,12 +954,10 @@ const StyleHandler = {
 			}
 		) ;
 		
-		if ( found )
-		{
+		if ( found ) {
 			target.setAttribute( 'style' , styles.trim() ) ;
 		}
-		else if ( value )
-		{
+		else if ( value ) {
 			target.setAttribute( 'style' , styles + ';' + property + ':' + value ) ;
 		}
 		
